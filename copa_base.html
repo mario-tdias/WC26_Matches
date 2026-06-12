@@ -363,10 +363,10 @@
     <script>
         const JOGOS_POR_PAGINA = 2;
         const GRUPOS_POR_PAGINA = 4;
-        const INTERVALO_PLACARES = 30000;
-        const INTERVALO_GRUPOS = 120000;
+        const INTERVALO_AO_VIVO = 30000;
         const INTERVALO_CARROSSEL = 7000;
         const ESPN_URL = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard';
+        const ESPN_STANDINGS_URL = 'https://site.api.espn.com/apis/v2/sports/soccer/fifa.world/standings';
 
         const NOMES_PT = {
             'Mexico': 'México', 'South Africa': 'África do Sul', 'Brazil': 'Brasil',
@@ -472,31 +472,85 @@
             return jogos.sort((a, b) => a.hora.localeCompare(b.hora));
         }
 
-        async function atualizarPlacaresAoVivo() {
+        function extrairStat(stats, nome) {
+            const stat = (stats || []).find(s => s.name === nome);
+            return stat ? stat.displayValue : '-';
+        }
+
+        function parseEspnGrupos(dados) {
+            const grupos = [];
+
+            for (const grupo of dados.children || []) {
+                const letra = (grupo.name || '').replace('Group ', '').trim();
+                const entries = grupo.standings?.entries || [];
+
+                const times = [...entries]
+                    .sort((a, b) =>
+                        parseInt(extrairStat(a.stats, 'rank') || 99) -
+                        parseInt(extrairStat(b.stats, 'rank') || 99)
+                    )
+                    .map(entry => {
+                        const time = entry.team || {};
+                        const logos = time.logos || [];
+                        const stats = entry.stats || [];
+                        const note = entry.note || {};
+
+                        return {
+                            posicao: extrairStat(stats, 'rank'),
+                            nome: traduzirNome(time.displayName || ''),
+                            sigla: time.abbreviation || '',
+                            logo: logos[0]?.href || time.logo || '',
+                            pontos: extrairStat(stats, 'points'),
+                            jogos: extrairStat(stats, 'gamesPlayed'),
+                            saldo: extrairStat(stats, 'pointDifferential'),
+                            classificado: (note.description || '').includes('Advance'),
+                        };
+                    });
+
+                grupos.push({ nome: `Grupo ${letra}`, letra, times });
+            }
+
+            return grupos.sort((a, b) => a.letra.localeCompare(b.letra));
+        }
+
+        async function atualizarAoVivo() {
             try {
-                const resp = await fetch(`${ESPN_URL}?dates=${dataHojeBR()}`);
-                if (!resp.ok) return;
+                const [respJogos, respGrupos] = await Promise.all([
+                    fetch(`${ESPN_URL}?dates=${dataHojeBR()}`),
+                    fetch(ESPN_STANDINGS_URL),
+                ]);
 
-                const dados = await resp.json();
-                const jogosNovos = parseEspnJogos(dados);
-                if (jogosNovos.length === 0) return;
-
-                todosJogos = jogosNovos;
-                ultimaAtualizacao = new Date().toISOString();
-
+                let atualizou = false;
                 const slideAnterior = slideAtual;
+
+                if (respJogos.ok) {
+                    const jogosNovos = parseEspnJogos(await respJogos.json());
+                    if (jogosNovos.length > 0) {
+                        todosJogos = jogosNovos;
+                        atualizou = true;
+                    }
+                }
+
+                if (respGrupos.ok) {
+                    const gruposNovos = parseEspnGrupos(await respGrupos.json());
+                    if (gruposNovos.length > 0) {
+                        todosGrupos = gruposNovos;
+                        atualizou = true;
+                    }
+                }
+
+                if (!atualizou) return;
+
+                ultimaAtualizacao = new Date().toISOString();
                 montarSlides();
                 slideAtual = Math.min(slideAnterior, slides.length - 1);
-
-                if (slides[slideAtual]?.tipo === 'jogos') {
-                    renderizarSlide();
-                }
+                renderizarSlide();
 
                 const dt = new Date(ultimaAtualizacao);
                 const h = String(dt.getHours()).padStart(2, '0');
                 const m = String(dt.getMinutes()).padStart(2, '0');
                 document.getElementById('rodape').textContent =
-                    `Placares ao vivo · atualizado às ${h}:${m}`;
+                    `Dados ao vivo · atualizado às ${h}:${m}`;
             } catch {}
         }
 
@@ -735,10 +789,13 @@
         }
 
         async function iniciar() {
-            const carregou = await carregarDadosCompletos();
-            await atualizarPlacaresAoVivo();
+            await atualizarAoVivo();
 
-            if (!carregou && !todosJogos.length) {
+            if (!todosJogos.length && !todosGrupos.length) {
+                await carregarDadosCompletos();
+            }
+
+            if (!todosJogos.length && !todosGrupos.length) {
                 document.getElementById('jogos-container').innerHTML = `
                     <div class="sem-jogos">
                         <div class="icone">⚠️</div>
@@ -753,8 +810,7 @@
         atualizarRelogio();
 
         iniciar();
-        setInterval(atualizarPlacaresAoVivo, INTERVALO_PLACARES);
-        setInterval(carregarDadosCompletos, INTERVALO_GRUPOS);
+        setInterval(atualizarAoVivo, INTERVALO_AO_VIVO);
         setInterval(proximoSlide, INTERVALO_CARROSSEL);
     </script>
 </body>
