@@ -363,15 +363,142 @@
     <script>
         const JOGOS_POR_PAGINA = 2;
         const GRUPOS_POR_PAGINA = 4;
-        const INTERVALO_ATUALIZACAO = 15000;
+        const INTERVALO_PLACARES = 30000;
+        const INTERVALO_GRUPOS = 120000;
         const INTERVALO_CARROSSEL = 7000;
-        const INTERVALO_RECARGA = 120000;
+        const ESPN_URL = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard';
+
+        const NOMES_PT = {
+            'Mexico': 'México', 'South Africa': 'África do Sul', 'Brazil': 'Brasil',
+            'Argentina': 'Argentina', 'Germany': 'Alemanha', 'France': 'França',
+            'Spain': 'Espanha', 'Portugal': 'Portugal', 'England': 'Inglaterra',
+            'United States': 'Estados Unidos', 'Canada': 'Canadá', 'Japan': 'Japão',
+            'South Korea': 'Coreia do Sul', 'Netherlands': 'Holanda', 'Belgium': 'Bélgica',
+            'Croatia': 'Croácia', 'Uruguay': 'Uruguai', 'Colombia': 'Colômbia',
+            'Switzerland': 'Suíça', 'Morocco': 'Marrocos', 'Czechia': 'República Tcheca',
+            'Czech Republic': 'República Tcheca', 'Italy': 'Itália', 'Norway': 'Noruega',
+            'Ecuador': 'Equador', 'Mexico': 'México', 'Paraguay': 'Paraguai',
+            'Denmark': 'Dinamarca', 'Poland': 'Polônia', 'Serbia': 'Sérvia',
+            'Austria': 'Áustria', 'Turkey': 'Turquia', 'Wales': 'País de Gales',
+            'Scotland': 'Escócia', 'Ukraine': 'Ucrânia', 'Iran': 'Irã',
+            'Saudi Arabia': 'Arábia Saudita', 'Australia': 'Austrália', 'Qatar': 'Catar',
+            'Ghana': 'Gana', 'Senegal': 'Senegal', 'Cameroon': 'Camarões',
+            'Tunisia': 'Tunísia', 'Nigeria': 'Nigéria', 'Costa Rica': 'Costa Rica',
+            'Panama': 'Panamá', 'Haiti': 'Haiti', 'Jamaica': 'Jamaica',
+            'Korea Republic': 'Coreia do Sul',
+        };
 
         let todosJogos = [];
         let todosGrupos = [];
         let slides = [];
         let slideAtual = 0;
         let ultimaAtualizacao = null;
+        let slideTipoAtual = null;
+
+        function traduzirNome(nome) {
+            return NOMES_PT[nome] || nome;
+        }
+
+        function dataHojeBR() {
+            return new Intl.DateTimeFormat('en-CA', {
+                timeZone: 'America/Sao_Paulo',
+                year: 'numeric', month: '2-digit', day: '2-digit',
+            }).format(new Date()).replace(/-/g, '');
+        }
+
+        function statusEmPortugues(status) {
+            const state = status.type?.state || 'pre';
+            const descricao = status.type?.description || '';
+            const relogio = status.displayClock || '';
+            const detalhe = status.type?.shortDetail || '';
+            let texto;
+
+            if (state === 'in') {
+                const descLower = descricao.toLowerCase();
+                texto = descLower.includes('half') && !descLower.includes('full') ? 'Intervalo' : 'AO VIVO';
+            } else if (state === 'post') {
+                texto = 'Encerrado';
+            } else {
+                texto = 'Aguardando';
+            }
+
+            return { estado: state, texto, relogio, detalhe };
+        }
+
+        function parseEspnJogos(dados) {
+            const jogos = [];
+
+            for (const evento of dados.events || []) {
+                const competicao = evento.competitions?.[0];
+                if (!competicao) continue;
+
+                let casa = null;
+                let visitante = null;
+
+                for (const c of competicao.competitors || []) {
+                    const time = c.team || {};
+                    const info = {
+                        nome: traduzirNome(time.displayName || ''),
+                        sigla: time.abbreviation || '',
+                        logo: time.logo || '',
+                        gols: c.score ?? '-',
+                    };
+                    if (c.homeAway === 'home') casa = info;
+                    else visitante = info;
+                }
+
+                if (!casa || !visitante) continue;
+
+                const dataJogo = new Date(competicao.date || evento.date);
+                const hora = dataJogo.toLocaleTimeString('pt-BR', {
+                    timeZone: 'America/Sao_Paulo',
+                    hour: '2-digit', minute: '2-digit', hour12: false,
+                });
+
+                const venue = competicao.venue || {};
+                const endereco = venue.address || {};
+
+                jogos.push({
+                    id: evento.id,
+                    hora,
+                    casa,
+                    visitante,
+                    status: statusEmPortugues(competicao.status || {}),
+                    estadio: venue.fullName || '',
+                    cidade: endereco.city || '',
+                });
+            }
+
+            return jogos.sort((a, b) => a.hora.localeCompare(b.hora));
+        }
+
+        async function atualizarPlacaresAoVivo() {
+            try {
+                const resp = await fetch(`${ESPN_URL}?dates=${dataHojeBR()}`);
+                if (!resp.ok) return;
+
+                const dados = await resp.json();
+                const jogosNovos = parseEspnJogos(dados);
+                if (jogosNovos.length === 0) return;
+
+                todosJogos = jogosNovos;
+                ultimaAtualizacao = new Date().toISOString();
+
+                const slideAnterior = slideAtual;
+                montarSlides();
+                slideAtual = Math.min(slideAnterior, slides.length - 1);
+
+                if (slides[slideAtual]?.tipo === 'jogos') {
+                    renderizarSlide();
+                }
+
+                const dt = new Date(ultimaAtualizacao);
+                const h = String(dt.getHours()).padStart(2, '0');
+                const m = String(dt.getMinutes()).padStart(2, '0');
+                document.getElementById('rodape').textContent =
+                    `Placares ao vivo · atualizado às ${h}:${m}`;
+            } catch {}
+        }
 
         function atualizarRelogio() {
             const agora = new Date();
@@ -531,6 +658,7 @@
             }
 
             const slide = slides[slideAtual];
+            slideTipoAtual = slide.tipo;
 
             if (slide.tipo === 'jogos') {
                 subtitulo.textContent = slide.totalPaginas > 1
@@ -584,7 +712,7 @@
             }
         }
 
-        async function carregarJogos() {
+        async function carregarDadosCompletos() {
             const emServidor = location.protocol === 'http:' || location.protocol === 'https:';
 
             if (emServidor) {
@@ -592,7 +720,7 @@
                     const resp = await fetch(`jogos.json?t=${Date.now()}`);
                     if (resp.ok) {
                         aplicarDados(await resp.json());
-                        return;
+                        return true;
                     }
                 } catch {}
             }
@@ -600,28 +728,34 @@
             const dados = lerDadosEmbutidos();
             if (dados) {
                 aplicarDados(dados);
-                return;
+                return true;
             }
 
-            document.getElementById('jogos-container').innerHTML = `
-                <div class="sem-jogos">
-                    <div class="icone">⚠️</div>
-                    <div class="mensagem">Erro ao carregar jogos</div>
-                    <div class="sub">Execute: python gerar_jogos_copa.py</div>
-                </div>
-            `;
+            return false;
+        }
+
+        async function iniciar() {
+            const carregou = await carregarDadosCompletos();
+            await atualizarPlacaresAoVivo();
+
+            if (!carregou && !todosJogos.length) {
+                document.getElementById('jogos-container').innerHTML = `
+                    <div class="sem-jogos">
+                        <div class="icone">⚠️</div>
+                        <div class="mensagem">Erro ao carregar dados</div>
+                        <div class="sub">Verifique sua conexão com a internet</div>
+                    </div>
+                `;
+            }
         }
 
         setInterval(atualizarRelogio, 1000);
         atualizarRelogio();
 
-        carregarJogos();
-        setInterval(carregarJogos, INTERVALO_ATUALIZACAO);
+        iniciar();
+        setInterval(atualizarPlacaresAoVivo, INTERVALO_PLACARES);
+        setInterval(carregarDadosCompletos, INTERVALO_GRUPOS);
         setInterval(proximoSlide, INTERVALO_CARROSSEL);
-
-        if (location.protocol === 'file:') {
-            setInterval(() => location.reload(), INTERVALO_RECARGA);
-        }
     </script>
 </body>
 </html>
