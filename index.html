@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=576, height=384">
+    <title>Copa do Mundo 2026</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap');
+
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            width: 576px;
+            height: 384px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0a3d1f 0%, #1a6b3a 40%, #0d2818 100%);
+            color: #fff;
+            font-family: 'Roboto', sans-serif;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: linear-gradient(90deg, rgba(212, 175, 55, 0.25), rgba(0, 0, 0, 0.3));
+            border-bottom: 2px solid rgba(212, 175, 55, 0.6);
+            flex-shrink: 0;
+        }
+
+        .titulo {
+            font-size: 18px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .titulo span {
+            color: #d4af37;
+        }
+
+        .header-direita {
+            text-align: right;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        #relogio {
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        #data {
+            font-size: 11px;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
+        .conteudo {
+            flex: 1;
+            padding: 8px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow: hidden;
+        }
+
+        .subtitulo {
+            font-size: 12px;
+            color: #d4af37;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .jogos-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow: hidden;
+        }
+
+        .jogo-card {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 8px;
+            padding: 8px 10px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 0;
+        }
+
+        .jogo-topo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .jogo-hora {
+            font-size: 13px;
+            font-weight: 700;
+            color: #d4af37;
+        }
+
+        .jogo-status {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .jogo-status.ao-vivo {
+            background: #c0392b;
+            animation: pulsar 1.5s ease-in-out infinite;
+        }
+
+        .jogo-status.encerrado {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .jogo-status.aguardando {
+            background: rgba(52, 152, 219, 0.5);
+        }
+
+        @keyframes pulsar {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .placar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .time {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .time.visitante {
+            flex-direction: row-reverse;
+            text-align: right;
+        }
+
+        .time img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+            filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.8));
+            flex-shrink: 0;
+        }
+
+        .time-nome {
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+        }
+
+        .gols {
+            font-size: 36px;
+            font-weight: 900;
+            min-width: 70px;
+            text-align: center;
+            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8);
+            line-height: 1;
+        }
+
+        .jogo-info {
+            font-size: 10px;
+            text-align: center;
+            opacity: 0.75;
+            margin-top: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sem-jogos {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 8px;
+        }
+
+        .sem-jogos .icone {
+            font-size: 48px;
+        }
+
+        .sem-jogos .mensagem {
+            font-size: 16px;
+            font-weight: 700;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .sem-jogos .sub {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .rodape {
+            font-size: 9px;
+            text-align: center;
+            opacity: 0.5;
+            padding: 4px;
+            flex-shrink: 0;
+        }
+
+        .indicadores {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            padding: 2px 0;
+        }
+
+        .indicador {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: background 0.3s;
+        }
+
+        .indicador.ativo {
+            background: #d4af37;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="titulo">⚽ Copa do Mundo <span>2026</span></div>
+        <div class="header-direita">
+            <div id="relogio">--:--</div>
+            <div id="data">--/--/----</div>
+        </div>
+    </div>
+
+    <div class="conteudo">
+        <div class="subtitulo" id="subtitulo">Jogos de Hoje</div>
+        <div class="jogos-container" id="jogos-container">
+            <div class="sem-jogos">
+                <div class="icone">⚽</div>
+                <div class="mensagem">Carregando jogos...</div>
+            </div>
+        </div>
+        <div class="indicadores" id="indicadores"></div>
+    </div>
+
+    <div class="rodape" id="rodape">Atualizando...</div>
+
+    <script type="application/json" id="jogos-dados">{"atualizado_em": "2026-06-11T22:31:10.137587-03:00", "data": "2026-06-11", "data_formatada": "11/06/2026", "total": 2, "jogos": [{"id": "760415", "hora": "16:00", "casa": {"nome": "México", "sigla": "MEX", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/mex.png", "gols": "2"}, "visitante": {"nome": "África do Sul", "sigla": "RSA", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/rsa.png", "gols": "0"}, "status": {"estado": "post", "texto": "Encerrado", "relogio": "90'+8'", "detalhe": "FT"}, "estadio": "Estadio Banorte", "cidade": "Mexico City", "fase": "Group Stage"}, {"id": "760414", "hora": "23:00", "casa": {"nome": "Coreia do Sul", "sigla": "KOR", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/kors.png", "gols": "0"}, "visitante": {"nome": "República Tcheca", "sigla": "CZE", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png", "gols": "0"}, "status": {"estado": "pre", "texto": "Aguardando", "relogio": "0'", "detalhe": "Scheduled"}, "estadio": "Estadio Akron", "cidade": "Guadalajara", "fase": "Group Stage"}]}</script>
+
+    <script>
+        const JOGOS_POR_PAGINA = 2;
+        const INTERVALO_ATUALIZACAO = 15000;
+        const INTERVALO_ROTACAO = 8000;
+        const INTERVALO_RECARGA = 120000;
+
+        let todosJogos = [];
+        let paginaAtual = 0;
+        let ultimaAtualizacao = null;
+
+        function atualizarRelogio() {
+            const agora = new Date();
+            const hora = String(agora.getHours()).padStart(2, '0');
+            const minuto = String(agora.getMinutes()).padStart(2, '0');
+            const segundo = agora.getSeconds();
+            const separador = segundo % 2 === 0 ? ':' : ' ';
+            document.getElementById('relogio').textContent = `${hora}${separador}${minuto}`;
+
+            const dias = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+            const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+            document.getElementById('data').textContent =
+                `${dias[agora.getDay()]}, ${agora.getDate()} ${meses[agora.getMonth()]} ${agora.getFullYear()}`;
+        }
+
+        function classeStatus(status) {
+            if (status.estado === 'in') return 'ao-vivo';
+            if (status.estado === 'post') return 'encerrado';
+            return 'aguardando';
+        }
+
+        function textoStatus(status) {
+            if (status.estado === 'in') {
+                return status.relogio ? `AO VIVO ${status.relogio}` : 'AO VIVO';
+            }
+            return status.texto;
+        }
+
+        function renderizarJogo(jogo) {
+            const golsCasa = jogo.casa.gols ?? '-';
+            const golsVisitante = jogo.visitante.gols ?? '-';
+            const info = [jogo.estadio, jogo.cidade].filter(Boolean).join(' · ');
+
+            return `
+                <div class="jogo-card">
+                    <div class="jogo-topo">
+                        <span class="jogo-hora">${jogo.hora}</span>
+                        <span class="jogo-status ${classeStatus(jogo.status)}">${textoStatus(jogo.status)}</span>
+                    </div>
+                    <div class="placar">
+                        <div class="time casa">
+                            <img src="${jogo.casa.logo}" alt="${jogo.casa.nome}" onerror="this.style.display='none'">
+                            <span class="time-nome">${jogo.casa.nome}</span>
+                        </div>
+                        <div class="gols">${golsCasa} × ${golsVisitante}</div>
+                        <div class="time visitante">
+                            <img src="${jogo.visitante.logo}" alt="${jogo.visitante.nome}" onerror="this.style.display='none'">
+                            <span class="time-nome">${jogo.visitante.nome}</span>
+                        </div>
+                    </div>
+                    ${info ? `<div class="jogo-info">${info}</div>` : ''}
+                </div>
+            `;
+        }
+
+        function aplicarDados(dados) {
+            todosJogos = dados.jogos || [];
+            ultimaAtualizacao = dados.atualizado_em;
+
+            if (dados.total !== undefined) {
+                document.getElementById('subtitulo').textContent =
+                    `Jogos de Hoje — ${dados.total} jogo${dados.total !== 1 ? 's' : ''}`;
+            }
+
+            if (paginaAtual >= Math.ceil(todosJogos.length / JOGOS_POR_PAGINA)) {
+                paginaAtual = 0;
+            }
+
+            renderizarPagina();
+
+            if (ultimaAtualizacao) {
+                const dt = new Date(ultimaAtualizacao);
+                const h = String(dt.getHours()).padStart(2, '0');
+                const m = String(dt.getMinutes()).padStart(2, '0');
+                document.getElementById('rodape').textContent =
+                    `Placares atualizados às ${h}:${m} · atualização automática`;
+            }
+        }
+
+        function renderizarPagina() {
+            const container = document.getElementById('jogos-container');
+            const indicadores = document.getElementById('indicadores');
+
+            if (todosJogos.length === 0) {
+                container.innerHTML = `
+                    <div class="sem-jogos">
+                        <div class="icone">🏟️</div>
+                        <div class="mensagem">Nenhum jogo hoje</div>
+                        <div class="sub">Volte amanhã para acompanhar a Copa!</div>
+                    </div>
+                `;
+                indicadores.innerHTML = '';
+                return;
+            }
+
+            const totalPaginas = Math.ceil(todosJogos.length / JOGOS_POR_PAGINA);
+            const inicio = paginaAtual * JOGOS_POR_PAGINA;
+            const jogosPagina = todosJogos.slice(inicio, inicio + JOGOS_POR_PAGINA);
+
+            container.innerHTML = jogosPagina.map(renderizarJogo).join('');
+
+            if (totalPaginas > 1) {
+                indicadores.innerHTML = Array.from({ length: totalPaginas }, (_, i) =>
+                    `<div class="indicador ${i === paginaAtual ? 'ativo' : ''}"></div>`
+                ).join('');
+            } else {
+                indicadores.innerHTML = '';
+            }
+        }
+
+        function proximaPagina() {
+            const totalPaginas = Math.ceil(todosJogos.length / JOGOS_POR_PAGINA);
+            if (totalPaginas > 1) {
+                paginaAtual = (paginaAtual + 1) % totalPaginas;
+                renderizarPagina();
+            }
+        }
+
+        function lerDadosEmbutidos() {
+            const el = document.getElementById('jogos-dados');
+            if (!el) return null;
+            try {
+                return JSON.parse(el.textContent);
+            } catch {
+                return null;
+            }
+        }
+
+        async function carregarJogos() {
+            const emServidor = location.protocol === 'http:' || location.protocol === 'https:';
+
+            if (emServidor) {
+                try {
+                    const resp = await fetch(`jogos.json?t=${Date.now()}`);
+                    if (resp.ok) {
+                        aplicarDados(await resp.json());
+                        return;
+                    }
+                } catch {}
+            }
+
+            const dados = lerDadosEmbutidos();
+            if (dados) {
+                aplicarDados(dados);
+                return;
+            }
+
+            document.getElementById('jogos-container').innerHTML = `
+                <div class="sem-jogos">
+                    <div class="icone">⚠️</div>
+                    <div class="mensagem">Erro ao carregar jogos</div>
+                    <div class="sub">Execute: python gerar_jogos_copa.py</div>
+                </div>
+            `;
+        }
+
+        setInterval(atualizarRelogio, 1000);
+        atualizarRelogio();
+
+        carregarJogos();
+        setInterval(carregarJogos, INTERVALO_ATUALIZACAO);
+        setInterval(proximaPagina, INTERVALO_ROTACAO);
+
+        if (location.protocol === 'file:') {
+            setInterval(() => location.reload(), INTERVALO_RECARGA);
+        }
+    </script>
+</body>
+</html>
