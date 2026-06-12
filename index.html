@@ -246,6 +246,93 @@
         .indicador.ativo {
             background: #d4af37;
         }
+
+        .slide-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .grupos-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 5px;
+            min-height: 0;
+        }
+
+        .grupo-mini {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 6px;
+            padding: 4px 6px;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .grupo-mini-titulo {
+            font-size: 11px;
+            font-weight: 900;
+            color: #d4af37;
+            text-align: center;
+            margin-bottom: 3px;
+            letter-spacing: 0.5px;
+        }
+
+        .grupo-mini-linha {
+            display: grid;
+            grid-template-columns: 14px 18px 1fr 24px;
+            gap: 3px;
+            align-items: center;
+            padding: 3px 2px;
+            font-size: 10px;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .grupo-mini-linha:last-child {
+            border-bottom: none;
+        }
+
+        .grupo-mini-linha.classificado {
+            background: rgba(129, 214, 172, 0.12);
+            border-left: 2px solid #81D6AC;
+            padding-left: 0;
+        }
+
+        .grupo-mini-linha img {
+            width: 16px;
+            height: 16px;
+            object-fit: contain;
+        }
+
+        .grupo-mini-pos {
+            text-align: center;
+            opacity: 0.75;
+            font-size: 9px;
+        }
+
+        .grupo-mini-nome {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .grupo-mini-pts {
+            text-align: center;
+            color: #d4af37;
+            font-size: 11px;
+        }
     </style>
 </head>
 <body>
@@ -271,16 +358,19 @@
 
     <div class="rodape" id="rodape">Atualizando...</div>
 
-    <script type="application/json" id="jogos-dados">{"atualizado_em": "2026-06-11T22:31:10.137587-03:00", "data": "2026-06-11", "data_formatada": "11/06/2026", "total": 2, "jogos": [{"id": "760415", "hora": "16:00", "casa": {"nome": "México", "sigla": "MEX", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/mex.png", "gols": "2"}, "visitante": {"nome": "África do Sul", "sigla": "RSA", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/rsa.png", "gols": "0"}, "status": {"estado": "post", "texto": "Encerrado", "relogio": "90'+8'", "detalhe": "FT"}, "estadio": "Estadio Banorte", "cidade": "Mexico City", "fase": "Group Stage"}, {"id": "760414", "hora": "23:00", "casa": {"nome": "Coreia do Sul", "sigla": "KOR", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/kors.png", "gols": "0"}, "visitante": {"nome": "República Tcheca", "sigla": "CZE", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png", "gols": "0"}, "status": {"estado": "pre", "texto": "Aguardando", "relogio": "0'", "detalhe": "Scheduled"}, "estadio": "Estadio Akron", "cidade": "Guadalajara", "fase": "Group Stage"}]}</script>
+    <script type="application/json" id="jogos-dados">{"atualizado_em": "2026-06-11T22:43:07.003731-03:00", "data": "2026-06-11", "data_formatada": "11/06/2026", "total": 2, "jogos": [{"id": "760415", "hora": "16:00", "casa": {"nome": "México", "sigla": "MEX", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/mex.png", "gols": "2"}, "visitante": {"nome": "África do Sul", "sigla": "RSA", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/rsa.png", "gols": "0"}, "status": {"estado": "post", "texto": "Encerrado", "relogio": "90'+8'", "detalhe": "FT"}, "estadio": "Estadio Banorte", "cidade": "Mexico City", "fase": "Group Stage"}, {"id": "760414", "hora": "23:00", "casa": {"nome": "Coreia do Sul", "sigla": "KOR", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/kors.png", "gols": "0"}, "visitante": {"nome": "República Tcheca", "sigla": "CZE", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png", "gols": "0"}, "status": {"estado": "pre", "texto": "Aguardando", "relogio": "0'", "detalhe": "Scheduled"}, "estadio": "Estadio Akron", "cidade": "Guadalajara", "fase": "Group Stage"}], "grupos": [{"nome": "Grupo A", "letra": "A", "times": [{"posicao": "1", "nome": "México", "sigla": "MEX", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/mex.png", "pontos": "3", "jogos": "1", "saldo": "+2", "classificado": true}, {"posicao": "2", "nome": "Coreia do Sul", "sigla": "KOR", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/kors.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": true}, {"posicao": "3", "nome": "República Tcheca", "sigla": "CZE", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/cze.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": false}, {"posicao": "4", "nome": "África do Sul", "sigla": "RSA", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/rsa.png", "pontos": "0", "jogos": "1", "saldo": "-2", "classificado": false}]}, {"nome": "Grupo B", "letra": "B", "times": [{"posicao": "1", "nome": "Canadá", "sigla": "CAN", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/can.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": true}, {"posicao": "2", "nome": "Bosnia-Herzegovina", "sigla": "BIH", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/bih.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": true}, {"posicao": "3", "nome": "Catar", "sigla": "QAT", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/qat.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": false}, {"posicao": "4", "nome": "Suíça", "sigla": "SUI", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/sui.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": false}]}, {"nome": "Grupo C", "letra": "C", "times": [{"posicao": "1", "nome": "Brasil", "sigla": "BRA", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/bra.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": true}, {"posicao": "2", "nome": "Marrocos", "sigla": "MAR", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/mar.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": true}, {"posicao": "3", "nome": "Haiti", "sigla": "HAI", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/hai.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": false}, {"posicao": "4", "nome": "Escócia", "sigla": "SCO", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/sco.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": false}]}, {"nome": "Grupo D", "letra": "D", "times": [{"posicao": "1", "nome": "Estados Unidos", "sigla": "USA", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/usa.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": true}, {"posicao": "2", "nome": "Paraguai", "sigla": "PAR", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/par.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": true}, {"posicao": "3", "nome": "Austrália", "sigla": "AUS", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/aus.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": false}, {"posicao": "4", "nome": "Türkiye", "sigla": "TUR", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/tur.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": false}]}, {"nome": "Grupo E", "letra": "E", "times": [{"posicao": "1", "nome": "Alemanha", "sigla": "GER", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/ger.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": true}, {"posicao": "2", "nome": "Curaçao", "sigla": "CUW", "logo": "https://a.espncdn.com/i/teamlogos/soccer/500/11678.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": true}, {"posicao": "3", "nome": "Costa do Marfim", "sigla": "CIV", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/civ.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": false}, {"posicao": "4", "nome": "Equador", "sigla": "ECU", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/ecu.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": false}]}, {"nome": "Grupo F", "letra": "F", "times": [{"posicao": "1", "nome": "Holanda", "sigla": "NED", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/ned.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": true}, {"posicao": "2", "nome": "Japão", "sigla": "JPN", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/jpn.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": true}, {"posicao": "3", "nome": "Suécia", "sigla": "SWE", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/swe.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": false}, {"posicao": "4", "nome": "Tunísia", "sigla": "TUN", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/tun.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": false}]}, {"nome": "Grupo G", "letra": "G", "times": [{"posicao": "1", "nome": "Bélgica", "sigla": "BEL", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/bel.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": true}, {"posicao": "2", "nome": "Egito", "sigla": "EGY", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/egy.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": true}, {"posicao": "3", "nome": "Irã", "sigla": "IRN", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/irn.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": false}, {"posicao": "4", "nome": "Nova Zelândia", "sigla": "NZL", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/nzl.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": false}]}, {"nome": "Grupo H", "letra": "H", "times": [{"posicao": "1", "nome": "Espanha", "sigla": "ESP", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/esp.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": true}, {"posicao": "2", "nome": "Cabo Verde", "sigla": "CPV", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/cpv.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": true}, {"posicao": "3", "nome": "Arábia Saudita", "sigla": "KSA", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/ksa.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": false}, {"posicao": "4", "nome": "Uruguai", "sigla": "URU", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/uru.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": false}]}, {"nome": "Grupo I", "letra": "I", "times": [{"posicao": "1", "nome": "França", "sigla": "FRA", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/fra.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": true}, {"posicao": "2", "nome": "Senegal", "sigla": "SEN", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/sen.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": true}, {"posicao": "3", "nome": "Iraque", "sigla": "IRQ", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/irq.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": false}, {"posicao": "4", "nome": "Noruega", "sigla": "NOR", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/nor.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": false}]}, {"nome": "Grupo J", "letra": "J", "times": [{"posicao": "1", "nome": "Argentina", "sigla": "ARG", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/arg.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": true}, {"posicao": "2", "nome": "Argélia", "sigla": "ALG", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/alg.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": true}, {"posicao": "3", "nome": "Áustria", "sigla": "AUT", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/aut.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": false}, {"posicao": "4", "nome": "Jordânia", "sigla": "JOR", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/jor.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": false}]}, {"nome": "Grupo K", "letra": "K", "times": [{"posicao": "1", "nome": "Portugal", "sigla": "POR", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/por.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": true}, {"posicao": "2", "nome": "Congo DR", "sigla": "COD", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/rdc.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": true}, {"posicao": "3", "nome": "Uzbequistão", "sigla": "UZB", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/uzb.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": false}, {"posicao": "4", "nome": "Colômbia", "sigla": "COL", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/col.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": false}]}, {"nome": "Grupo L", "letra": "L", "times": [{"posicao": "1", "nome": "Inglaterra", "sigla": "ENG", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/eng.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": true}, {"posicao": "2", "nome": "Croácia", "sigla": "CRO", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/cro.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": true}, {"posicao": "3", "nome": "Gana", "sigla": "GHA", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/gha.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": false}, {"posicao": "4", "nome": "Panamá", "sigla": "PAN", "logo": "https://a.espncdn.com/i/teamlogos/countries/500/pan.png", "pontos": "0", "jogos": "0", "saldo": "0", "classificado": false}]}]}</script>
 
     <script>
         const JOGOS_POR_PAGINA = 2;
+        const GRUPOS_POR_PAGINA = 4;
         const INTERVALO_ATUALIZACAO = 15000;
-        const INTERVALO_ROTACAO = 8000;
+        const INTERVALO_CARROSSEL = 7000;
         const INTERVALO_RECARGA = 120000;
 
         let todosJogos = [];
-        let paginaAtual = 0;
+        let todosGrupos = [];
+        let slides = [];
+        let slideAtual = 0;
         let ultimaAtualizacao = null;
 
         function atualizarRelogio() {
@@ -337,66 +427,150 @@
             `;
         }
 
+        function renderizarGrupoMini(grupo) {
+            const linhas = grupo.times.map(time => `
+                <div class="grupo-mini-linha ${time.classificado ? 'classificado' : ''}">
+                    <span class="grupo-mini-pos">${time.posicao}</span>
+                    <img src="${time.logo}" alt="${time.nome}" onerror="this.style.display='none'">
+                    <span class="grupo-mini-nome">${time.nome}</span>
+                    <span class="grupo-mini-pts">${time.pontos}</span>
+                </div>
+            `).join('');
+
+            return `
+                <div class="grupo-mini">
+                    <div class="grupo-mini-titulo">${grupo.nome}</div>
+                    ${linhas}
+                </div>
+            `;
+        }
+
+        function renderizarGruposPagina(grupos) {
+            return `
+                <div class="slide-area">
+                    <div class="grupos-grid">
+                        ${grupos.map(renderizarGrupoMini).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function tituloGrupos(grupos) {
+            const letras = grupos.map(g => g.letra);
+            if (letras.length === 1) return `Grupo ${letras[0]}`;
+            return `Grupos ${letras[0]}–${letras[letras.length - 1]}`;
+        }
+
+        function montarSlides() {
+            slides = [];
+
+            if (todosJogos.length === 0) {
+                slides.push({ tipo: 'vazio' });
+            } else {
+                const totalPaginas = Math.ceil(todosJogos.length / JOGOS_POR_PAGINA);
+                for (let i = 0; i < totalPaginas; i++) {
+                    const inicio = i * JOGOS_POR_PAGINA;
+                    slides.push({
+                        tipo: 'jogos',
+                        jogos: todosJogos.slice(inicio, inicio + JOGOS_POR_PAGINA),
+                        pagina: i + 1,
+                        totalPaginas,
+                    });
+                }
+            }
+
+            const totalPaginasGrupos = Math.ceil(todosGrupos.length / GRUPOS_POR_PAGINA);
+            for (let i = 0; i < totalPaginasGrupos; i++) {
+                const inicio = i * GRUPOS_POR_PAGINA;
+                const gruposPagina = todosGrupos.slice(inicio, inicio + GRUPOS_POR_PAGINA);
+                slides.push({
+                    tipo: 'grupos',
+                    grupos: gruposPagina,
+                    pagina: i + 1,
+                    totalPaginas: totalPaginasGrupos,
+                });
+            }
+        }
+
         function aplicarDados(dados) {
             todosJogos = dados.jogos || [];
+            todosGrupos = dados.grupos || [];
             ultimaAtualizacao = dados.atualizado_em;
 
-            if (dados.total !== undefined) {
-                document.getElementById('subtitulo').textContent =
-                    `Jogos de Hoje — ${dados.total} jogo${dados.total !== 1 ? 's' : ''}`;
+            montarSlides();
+
+            if (slideAtual >= slides.length) {
+                slideAtual = 0;
             }
 
-            if (paginaAtual >= Math.ceil(todosJogos.length / JOGOS_POR_PAGINA)) {
-                paginaAtual = 0;
-            }
-
-            renderizarPagina();
+            renderizarSlide();
 
             if (ultimaAtualizacao) {
                 const dt = new Date(ultimaAtualizacao);
                 const h = String(dt.getHours()).padStart(2, '0');
                 const m = String(dt.getMinutes()).padStart(2, '0');
                 document.getElementById('rodape').textContent =
-                    `Placares atualizados às ${h}:${m} · atualização automática`;
+                    `Atualizado às ${h}:${m} · carrossel a cada 7s`;
             }
         }
 
-        function renderizarPagina() {
+        function renderizarSlide() {
             const container = document.getElementById('jogos-container');
             const indicadores = document.getElementById('indicadores');
+            const subtitulo = document.getElementById('subtitulo');
 
-            if (todosJogos.length === 0) {
+            if (slides.length === 0) {
                 container.innerHTML = `
                     <div class="sem-jogos">
                         <div class="icone">🏟️</div>
-                        <div class="mensagem">Nenhum jogo hoje</div>
-                        <div class="sub">Volte amanhã para acompanhar a Copa!</div>
+                        <div class="mensagem">Carregando...</div>
                     </div>
                 `;
                 indicadores.innerHTML = '';
                 return;
             }
 
-            const totalPaginas = Math.ceil(todosJogos.length / JOGOS_POR_PAGINA);
-            const inicio = paginaAtual * JOGOS_POR_PAGINA;
-            const jogosPagina = todosJogos.slice(inicio, inicio + JOGOS_POR_PAGINA);
+            const slide = slides[slideAtual];
 
-            container.innerHTML = jogosPagina.map(renderizarJogo).join('');
+            if (slide.tipo === 'jogos') {
+                subtitulo.textContent = slide.totalPaginas > 1
+                    ? `Jogos de Hoje (${slide.pagina}/${slide.totalPaginas})`
+                    : `Jogos de Hoje — ${todosJogos.length} jogo${todosJogos.length !== 1 ? 's' : ''}`;
+                container.innerHTML = `
+                    <div class="slide-area jogos-container">
+                        ${slide.jogos.map(renderizarJogo).join('')}
+                    </div>
+                `;
+            } else if (slide.tipo === 'grupos') {
+                const titulo = tituloGrupos(slide.grupos);
+                subtitulo.textContent = slide.totalPaginas > 1
+                    ? `Classificação — ${titulo} (${slide.pagina}/${slide.totalPaginas})`
+                    : `Classificação — ${titulo}`;
+                container.innerHTML = renderizarGruposPagina(slide.grupos);
+            } else {
+                subtitulo.textContent = 'Jogos de Hoje';
+                container.innerHTML = `
+                    <div class="sem-jogos">
+                        <div class="icone">🏟️</div>
+                        <div class="mensagem">Nenhum jogo hoje</div>
+                        <div class="sub">Confira a classificação dos grupos</div>
+                    </div>
+                `;
+            }
 
-            if (totalPaginas > 1) {
-                indicadores.innerHTML = Array.from({ length: totalPaginas }, (_, i) =>
-                    `<div class="indicador ${i === paginaAtual ? 'ativo' : ''}"></div>`
+            if (slides.length > 1) {
+                indicadores.innerHTML = slides.map((s, i) =>
+                    `<div class="indicador ${i === slideAtual ? 'ativo' : ''}"></div>`
                 ).join('');
             } else {
                 indicadores.innerHTML = '';
             }
         }
 
-        function proximaPagina() {
-            const totalPaginas = Math.ceil(todosJogos.length / JOGOS_POR_PAGINA);
-            if (totalPaginas > 1) {
-                paginaAtual = (paginaAtual + 1) % totalPaginas;
-                renderizarPagina();
+        function proximoSlide() {
+            if (slides.length > 1) {
+                slideAtual = (slideAtual + 1) % slides.length;
+                renderizarSlide();
             }
         }
 
@@ -443,7 +617,7 @@
 
         carregarJogos();
         setInterval(carregarJogos, INTERVALO_ATUALIZACAO);
-        setInterval(proximaPagina, INTERVALO_ROTACAO);
+        setInterval(proximoSlide, INTERVALO_CARROSSEL);
 
         if (location.protocol === 'file:') {
             setInterval(() => location.reload(), INTERVALO_RECARGA);

@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 
 # --- CONFIGURAÇÃO ---
 ESPN_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard"
+ESPN_STANDINGS_URL = "https://site.api.espn.com/apis/v2/sports/soccer/fifa.world/standings"
 ARQUIVO_BASE = "copa_base.html"
 ARQUIVO_JSON = "jogos.json"
 ARQUIVO_HTML = "index.html"
@@ -234,6 +235,55 @@ def buscar_jogos() -> list:
     return jogos
 
 
+def extrair_stat(stats: list, nome: str) -> str:
+    for stat in stats:
+        if stat.get("name") == nome:
+            return stat.get("displayValue", "-")
+    return "-"
+
+
+def buscar_grupos() -> list:
+    req = urllib.request.Request(
+        ESPN_STANDINGS_URL, headers={"User-Agent": "painel-copa-2026/1.0"}
+    )
+    with urllib.request.urlopen(req, timeout=20) as response:
+        dados = json.loads(response.read())
+
+    grupos = []
+    for grupo in dados.get("children", []):
+        nome_grupo = grupo.get("name", "")
+        letra = nome_grupo.replace("Group ", "").strip()
+        entries = grupo.get("standings", {}).get("entries", [])
+
+        times = []
+        for entry in sorted(entries, key=lambda e: int(extrair_stat(e.get("stats", []), "rank") or 99)):
+            time = entry.get("team", {})
+            logos = time.get("logos", [])
+            logo = logos[0].get("href", "") if logos else time.get("logo", "")
+            stats = entry.get("stats", [])
+            note = entry.get("note", {})
+
+            times.append({
+                "posicao": extrair_stat(stats, "rank"),
+                "nome": traduzir_nome(time.get("displayName", "")),
+                "sigla": time.get("abbreviation", ""),
+                "logo": logo,
+                "pontos": extrair_stat(stats, "points"),
+                "jogos": extrair_stat(stats, "gamesPlayed"),
+                "saldo": extrair_stat(stats, "pointDifferential"),
+                "classificado": "Advance" in note.get("description", ""),
+            })
+
+        grupos.append({
+            "nome": f"Grupo {letra}",
+            "letra": letra,
+            "times": times,
+        })
+
+    grupos.sort(key=lambda g: g["letra"])
+    return grupos
+
+
 def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     caminho_json = os.path.join(script_dir, ARQUIVO_JSON)
@@ -241,6 +291,7 @@ def main():
     caminho_html = os.path.join(script_dir, ARQUIVO_HTML)
 
     jogos = buscar_jogos()
+    grupos = buscar_grupos()
     agora = datetime.now(FUSO)
 
     payload = {
@@ -249,6 +300,7 @@ def main():
         "data_formatada": agora.strftime("%d/%m/%Y"),
         "total": len(jogos),
         "jogos": jogos,
+        "grupos": grupos,
     }
 
     with open(caminho_json, "w", encoding="utf-8") as f:
@@ -263,7 +315,10 @@ def main():
     with open(caminho_html, "w", encoding="utf-8") as f:
         f.write(html_final)
 
-    print(f"Sucesso! {len(jogos)} jogo(s) gerados em {ARQUIVO_JSON} e {ARQUIVO_HTML}.")
+    print(
+        f"Sucesso! {len(jogos)} jogo(s) e {len(grupos)} grupo(s) "
+        f"gerados em {ARQUIVO_JSON} e {ARQUIVO_HTML}."
+    )
 
 
 if __name__ == "__main__":

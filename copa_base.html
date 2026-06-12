@@ -246,6 +246,93 @@
         .indicador.ativo {
             background: #d4af37;
         }
+
+        .slide-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .grupos-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 5px;
+            min-height: 0;
+        }
+
+        .grupo-mini {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 6px;
+            padding: 4px 6px;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .grupo-mini-titulo {
+            font-size: 11px;
+            font-weight: 900;
+            color: #d4af37;
+            text-align: center;
+            margin-bottom: 3px;
+            letter-spacing: 0.5px;
+        }
+
+        .grupo-mini-linha {
+            display: grid;
+            grid-template-columns: 14px 18px 1fr 24px;
+            gap: 3px;
+            align-items: center;
+            padding: 3px 2px;
+            font-size: 10px;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .grupo-mini-linha:last-child {
+            border-bottom: none;
+        }
+
+        .grupo-mini-linha.classificado {
+            background: rgba(129, 214, 172, 0.12);
+            border-left: 2px solid #81D6AC;
+            padding-left: 0;
+        }
+
+        .grupo-mini-linha img {
+            width: 16px;
+            height: 16px;
+            object-fit: contain;
+        }
+
+        .grupo-mini-pos {
+            text-align: center;
+            opacity: 0.75;
+            font-size: 9px;
+        }
+
+        .grupo-mini-nome {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .grupo-mini-pts {
+            text-align: center;
+            color: #d4af37;
+            font-size: 11px;
+        }
     </style>
 </head>
 <body>
@@ -275,12 +362,15 @@
 
     <script>
         const JOGOS_POR_PAGINA = 2;
+        const GRUPOS_POR_PAGINA = 4;
         const INTERVALO_ATUALIZACAO = 15000;
-        const INTERVALO_ROTACAO = 8000;
+        const INTERVALO_CARROSSEL = 7000;
         const INTERVALO_RECARGA = 120000;
 
         let todosJogos = [];
-        let paginaAtual = 0;
+        let todosGrupos = [];
+        let slides = [];
+        let slideAtual = 0;
         let ultimaAtualizacao = null;
 
         function atualizarRelogio() {
@@ -337,66 +427,150 @@
             `;
         }
 
+        function renderizarGrupoMini(grupo) {
+            const linhas = grupo.times.map(time => `
+                <div class="grupo-mini-linha ${time.classificado ? 'classificado' : ''}">
+                    <span class="grupo-mini-pos">${time.posicao}</span>
+                    <img src="${time.logo}" alt="${time.nome}" onerror="this.style.display='none'">
+                    <span class="grupo-mini-nome">${time.nome}</span>
+                    <span class="grupo-mini-pts">${time.pontos}</span>
+                </div>
+            `).join('');
+
+            return `
+                <div class="grupo-mini">
+                    <div class="grupo-mini-titulo">${grupo.nome}</div>
+                    ${linhas}
+                </div>
+            `;
+        }
+
+        function renderizarGruposPagina(grupos) {
+            return `
+                <div class="slide-area">
+                    <div class="grupos-grid">
+                        ${grupos.map(renderizarGrupoMini).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function tituloGrupos(grupos) {
+            const letras = grupos.map(g => g.letra);
+            if (letras.length === 1) return `Grupo ${letras[0]}`;
+            return `Grupos ${letras[0]}–${letras[letras.length - 1]}`;
+        }
+
+        function montarSlides() {
+            slides = [];
+
+            if (todosJogos.length === 0) {
+                slides.push({ tipo: 'vazio' });
+            } else {
+                const totalPaginas = Math.ceil(todosJogos.length / JOGOS_POR_PAGINA);
+                for (let i = 0; i < totalPaginas; i++) {
+                    const inicio = i * JOGOS_POR_PAGINA;
+                    slides.push({
+                        tipo: 'jogos',
+                        jogos: todosJogos.slice(inicio, inicio + JOGOS_POR_PAGINA),
+                        pagina: i + 1,
+                        totalPaginas,
+                    });
+                }
+            }
+
+            const totalPaginasGrupos = Math.ceil(todosGrupos.length / GRUPOS_POR_PAGINA);
+            for (let i = 0; i < totalPaginasGrupos; i++) {
+                const inicio = i * GRUPOS_POR_PAGINA;
+                const gruposPagina = todosGrupos.slice(inicio, inicio + GRUPOS_POR_PAGINA);
+                slides.push({
+                    tipo: 'grupos',
+                    grupos: gruposPagina,
+                    pagina: i + 1,
+                    totalPaginas: totalPaginasGrupos,
+                });
+            }
+        }
+
         function aplicarDados(dados) {
             todosJogos = dados.jogos || [];
+            todosGrupos = dados.grupos || [];
             ultimaAtualizacao = dados.atualizado_em;
 
-            if (dados.total !== undefined) {
-                document.getElementById('subtitulo').textContent =
-                    `Jogos de Hoje — ${dados.total} jogo${dados.total !== 1 ? 's' : ''}`;
+            montarSlides();
+
+            if (slideAtual >= slides.length) {
+                slideAtual = 0;
             }
 
-            if (paginaAtual >= Math.ceil(todosJogos.length / JOGOS_POR_PAGINA)) {
-                paginaAtual = 0;
-            }
-
-            renderizarPagina();
+            renderizarSlide();
 
             if (ultimaAtualizacao) {
                 const dt = new Date(ultimaAtualizacao);
                 const h = String(dt.getHours()).padStart(2, '0');
                 const m = String(dt.getMinutes()).padStart(2, '0');
                 document.getElementById('rodape').textContent =
-                    `Placares atualizados às ${h}:${m} · atualização automática`;
+                    `Atualizado às ${h}:${m} · carrossel a cada 7s`;
             }
         }
 
-        function renderizarPagina() {
+        function renderizarSlide() {
             const container = document.getElementById('jogos-container');
             const indicadores = document.getElementById('indicadores');
+            const subtitulo = document.getElementById('subtitulo');
 
-            if (todosJogos.length === 0) {
+            if (slides.length === 0) {
                 container.innerHTML = `
                     <div class="sem-jogos">
                         <div class="icone">🏟️</div>
-                        <div class="mensagem">Nenhum jogo hoje</div>
-                        <div class="sub">Volte amanhã para acompanhar a Copa!</div>
+                        <div class="mensagem">Carregando...</div>
                     </div>
                 `;
                 indicadores.innerHTML = '';
                 return;
             }
 
-            const totalPaginas = Math.ceil(todosJogos.length / JOGOS_POR_PAGINA);
-            const inicio = paginaAtual * JOGOS_POR_PAGINA;
-            const jogosPagina = todosJogos.slice(inicio, inicio + JOGOS_POR_PAGINA);
+            const slide = slides[slideAtual];
 
-            container.innerHTML = jogosPagina.map(renderizarJogo).join('');
+            if (slide.tipo === 'jogos') {
+                subtitulo.textContent = slide.totalPaginas > 1
+                    ? `Jogos de Hoje (${slide.pagina}/${slide.totalPaginas})`
+                    : `Jogos de Hoje — ${todosJogos.length} jogo${todosJogos.length !== 1 ? 's' : ''}`;
+                container.innerHTML = `
+                    <div class="slide-area jogos-container">
+                        ${slide.jogos.map(renderizarJogo).join('')}
+                    </div>
+                `;
+            } else if (slide.tipo === 'grupos') {
+                const titulo = tituloGrupos(slide.grupos);
+                subtitulo.textContent = slide.totalPaginas > 1
+                    ? `Classificação — ${titulo} (${slide.pagina}/${slide.totalPaginas})`
+                    : `Classificação — ${titulo}`;
+                container.innerHTML = renderizarGruposPagina(slide.grupos);
+            } else {
+                subtitulo.textContent = 'Jogos de Hoje';
+                container.innerHTML = `
+                    <div class="sem-jogos">
+                        <div class="icone">🏟️</div>
+                        <div class="mensagem">Nenhum jogo hoje</div>
+                        <div class="sub">Confira a classificação dos grupos</div>
+                    </div>
+                `;
+            }
 
-            if (totalPaginas > 1) {
-                indicadores.innerHTML = Array.from({ length: totalPaginas }, (_, i) =>
-                    `<div class="indicador ${i === paginaAtual ? 'ativo' : ''}"></div>`
+            if (slides.length > 1) {
+                indicadores.innerHTML = slides.map((s, i) =>
+                    `<div class="indicador ${i === slideAtual ? 'ativo' : ''}"></div>`
                 ).join('');
             } else {
                 indicadores.innerHTML = '';
             }
         }
 
-        function proximaPagina() {
-            const totalPaginas = Math.ceil(todosJogos.length / JOGOS_POR_PAGINA);
-            if (totalPaginas > 1) {
-                paginaAtual = (paginaAtual + 1) % totalPaginas;
-                renderizarPagina();
+        function proximoSlide() {
+            if (slides.length > 1) {
+                slideAtual = (slideAtual + 1) % slides.length;
+                renderizarSlide();
             }
         }
 
@@ -443,7 +617,7 @@
 
         carregarJogos();
         setInterval(carregarJogos, INTERVALO_ATUALIZACAO);
-        setInterval(proximaPagina, INTERVALO_ROTACAO);
+        setInterval(proximoSlide, INTERVALO_CARROSSEL);
 
         if (location.protocol === 'file:') {
             setInterval(() => location.reload(), INTERVALO_RECARGA);
